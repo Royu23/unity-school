@@ -1,25 +1,32 @@
 const StudentModel=require("../Models/StudentsModel");
-const { get } = require("../Routes/StudentsRoute");
+
 
 const createStudent=async(req,res)=>{
-     const {name,age,gender,standard,division,address}=req.body; 
+    console.log(req.body,"req")
+     const {per,age,gender,standard,division,address,pincode,parentId}=req.body; 
 
+   if(!per || !parentId){
+      res.send({
+        message:"invalid name or parentid"
+      })
+   }
 
  try{
         const newStudent=new StudentModel({  //storing data to db
-           Name:name,
+           Name:per,
            Age:age, 
            Gender:gender,
           Standard:standard,
           Division:division,
-          Guardian:guardian,
-          Guardian_phonnumber:guardian_phonenumber,
-           Address:address,
+          Address:address,
            Pincode:pincode,
+           parentId: parentId,
+            
         });
         await newStudent.save();
+        console.log(newStudent,"name")
         const resData={
-            Name:newStudent.name
+            studentname:newStudent.Name
         }
         console.log(resData,"data");               
         res.send({
@@ -37,9 +44,9 @@ const createStudent=async(req,res)=>{
 //get data from db 
 const getStudents=async(req,res)=>{
     try{
-        const StudentData=await TeacherModel.find();
+        const StudentData=await StudentModel.find().populate("parent");
         res.send({
-            message:"Teachers data fetched successfully",
+            message:"student data fetched successfully",
             data:StudentData
     })
     }catch(error){
@@ -59,11 +66,11 @@ const getStudentById=async(req,res)=>{
         const Student=await StudentModel.findById(id);
         if(!Student){
             res.send({
-                message:"Teachers data not available"
+                message:"student data not available"
             })
         }
         res.send({
-            message:"Teacher datafetched successfully",
+            message:"student datafetched successfully",
             data:Student
         })
     }catch(error){
@@ -81,7 +88,7 @@ const updateStudent=async(req,res)=>{
     const {name,age,gender,address,pincode,guardian,guardian_phonenumber,standard,division}=req.body; 
     try{
        const id=req.params.studentid;
-       const isStudentAvailable=await StudentModel.findById(id);
+       const isStudentAvailable=await StudentModel.findById(id).populate("parent");
        if(!isStudentAvailable){
         res.send({
             message:"Student not available"
@@ -94,15 +101,14 @@ const updateStudent=async(req,res)=>{
         {new:true}
     );
     res.send({
-        message:"updated studennt data",
-        data:updatedStudent
+        message:"updated student data",
+        data:updateStudent
     })
     }catch(error){
    res.send({
     message:"Not updated"
    })
-    }
-};
+    }};
 //delete
 const deleteStudent=async(req,res)=>{
   const id=req.params.studentid;

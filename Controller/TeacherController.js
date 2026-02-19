@@ -1,11 +1,23 @@
 //Teacher manipulation
 const TeacherModel=require("../Models/TeacherModel");
-
-                                      //http://127.0.0.1:8000/teacher
+//http://127.0.0.1:8000/teacher
 //posting data to db-(teachers)
+  const crypto = require('crypto');
+
+// Generates a 64-character hex string (32 bytes)
+
+
+  
+
+const generator = require('generate-password');
 const createTeacher=async(req,res)=>{              
     console.log("api called");
-    const {name,address,phonenumber,subject,standard}=req.body;   //data from frontend-- api
+    const { email,name,address,phonenumber,subject,standard}=req.body;   //data from frontend-- api
+    let passcode=generator.generate({
+        length: 10,
+        numbers: true
+    });
+ console.log(passcode);
       
     if(!name){
         return res.send({
@@ -14,16 +26,22 @@ const createTeacher=async(req,res)=>{
        }
     try{
         const newTeacher=new TeacherModel({  //storing data to db
-           name:name,
-           city:address.city,
-           pin:address.pin,
+           email,
+           name,
+           city:address?.city,
+           pin:address?.pin,
            phoneNumber:phonenumber, 
            subject:subject,
-          standard:standard
+          standard:standard,
+          password:passcode
+
+         
         });
         await newTeacher.save();
         const resData={
-            name:newTeacher.name
+            name:newTeacher.name,
+            email:newTeacher.email,
+            password:newTeacher.password
         }
         console.log(resData,"data");               
         res.send({
@@ -81,7 +99,7 @@ const getTeacherById=async(req,res)=>{
 
 //update
 const updateTeacher=async(req,res)=>{
-    const {name,address,phonenumber,subject,standard}=req.body; 
+    const {name,address,phonenumber,subject,standard,}=req.body; 
     try{
        const id=req.params.teacherid;
        const isTeacherAvailable=await TeacherModel.findById(id);
@@ -108,6 +126,7 @@ const updateTeacher=async(req,res)=>{
 };
 //delete
 const deleteTeacher=async(req,res)=>{
+    
   const id=req.params.teacherid;
     const TeacherAvailable=await TeacherModel.findById(id); //or  await TeacherModel.deleteOne({_id:id});
     if(!TeacherAvailable){
@@ -121,5 +140,44 @@ const deleteTeacher=async(req,res)=>{
    })
 }
 
+const LoginTeacher=async(req,res)=>{
+       const{email,password}=req.body;
+       console.log(req.body,"req");
+    try{
+     if(!email || !password){
+        res.send({
+          message:"enter valid email and password"
+        })
+     }
+  const Teacherdata= await TeacherModel.findOne({email:email });
+  console.log(Teacherdata,"data")
+  if(!Teacherdata){
+    res.send({message:"email not found"
+     })
+  }
+  const logintoken = crypto.randomBytes(32).toString('hex');
+  const loginexpiredat = new Date(Date.now() + 3600000);
+ if(Teacherdata.password===password){
+    res.send({
+        message:"Login successful",
+        data:{
+             name: Teacherdata.name,
+             email:Teacherdata.email,
+             accesstoken:{
+                token:logintoken,
+                 expiredat:loginexpiredat
+             }
+        }
+    })
+  }
+  
+}
+catch(error){
+        res.send({
+            message:"not entered",
+        })
+        console.log(error,"error")
 
-module.exports={createTeacher,getTeachers,getTeacherById,updateTeacher,deleteTeacher}
+}
+}
+module.exports={createTeacher,getTeachers,getTeacherById,updateTeacher,deleteTeacher,LoginTeacher}

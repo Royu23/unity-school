@@ -15,17 +15,17 @@ const StudentSchema=mongoose.Schema({
     Division:{
         type:String
     },
-    Guardian:{
-        type:String
-    },
-    Guardian_Phonenumber:{
-        type:Number
-    },
+  
     Address:{
         type:String
     },
-    Pincocde:{
+    Pincode:{
       type:String
+    },
+    parentId:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:"parent",
+        required:true,
     },
 },
 {
@@ -33,3 +33,4 @@ const StudentSchema=mongoose.Schema({
 },
 )
 module.exports=mongoose.model("Students",StudentSchema);
+

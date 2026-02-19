@@ -1,6 +1,11 @@
 const mongoose=require("mongoose");
 
 const TeacherSchema=mongoose.Schema({
+    email:{
+        type:String,
+        required:true,
+        unique:true
+    },
     name:{
         type:String,
         required:true
@@ -20,6 +25,9 @@ const TeacherSchema=mongoose.Schema({
     standard:{
         type:Number
     },
+    password:{
+        type:String
+    }
 },
     {
         Timestamp:true

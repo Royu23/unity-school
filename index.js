@@ -9,14 +9,13 @@ console.log(url,"url");
 const DbConnection=require("./config/ConnectDB");
 const TeacherRouter = require("./Routes/TeacherRoute");
 const StudentRouter =require("./Routes/StudentsRoute");
+const ParentRouter=require("./Routes/ParentRoute");
 
 
 //to establish connection btw frontend and backend
 const cors = require('cors');
 app.use(cors({ origin: ['http://localhost:3000'] }));       //frontend runs in port 3000
-
-
-
+ 
 // Middleware
 app.use(express.json());
 app.use(bodyParser.json());
@@ -24,6 +23,7 @@ DbConnection();
 
 app.use("/teacher",TeacherRouter);                          //teacher section route
 app.use("/student",StudentRouter);
+app.use("/parent",ParentRouter);
 
 
 //dAsnOnxqI61p9HFo
