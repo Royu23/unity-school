@@ -104,9 +104,9 @@ const updateTeacher=async(req,res)=>{
        const id=req.params.teacherid;
        const isTeacherAvailable=await TeacherModel.findById(id);
        if(!isTeacherAvailable){
-        res.send({
+        return res.status(404).send({
             message:"Teacher not available"
-        })
+        });
        }
 
        const updatedTeacher=await TeacherModel.findByIdAndUpdate(
